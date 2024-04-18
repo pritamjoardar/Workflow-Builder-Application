@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import useAppStore ,{useedgeStore} from '../../store';
+import  {useEdgeStore, useAppStore} from '../../store';
 
 import ReactFlow, {
   ReactFlowProvider,
@@ -17,10 +17,9 @@ import NodeSidebar from "../sidebar/NodeSidebar";
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
-
 const Myworkflow = () => {
   const {nodeData, updateNodeData} = useAppStore();
-  const {edgeData,updateEdgeData} = useedgeStore();
+  const {edgeData,updateEdgeData} = useEdgeStore();
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodeData);
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgeData);
@@ -65,7 +64,7 @@ const Myworkflow = () => {
 useEffect(()=>{
   updateNodeData(nodes);
   updateEdgeData(edges);
-},[nodes,edges])
+},[nodes,edges,nodeData,edgeData]);
   return (
     <div className="dndflow"  style={{ width: '100vw', height: '100vh' }}>
       <ReactFlowProvider>
@@ -86,7 +85,7 @@ useEffect(()=>{
             <Background variant="dots" gap={12} size={1} />
           </ReactFlow>
         </div>
-        <NodeSidebar/>
+        <NodeSidebar index ={"workflow"}/>
       </ReactFlowProvider>
     </div>
   );

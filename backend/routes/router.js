@@ -1,6 +1,10 @@
 const express =require("express");
 const router = express.Router();
+const multer = require('multer');
+const Papa = require('papaparse');
+const fs = require('fs');
 const Workflow = require('../model/WorkflowSchema')
+const upload = multer({ dest: 'uploads/' });
 
 router.post('/workflow',async(req,res)=>{
     try {
@@ -24,4 +28,51 @@ router.post('/workflow',async(req,res)=>{
       }
  });
 
+ //for uploading file
+ router.post('/upload', upload.single('file'), (req, res) => {
+  setTimeout(() => {
+  const file = req.file;
+  fs.readFile(file.path, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send(err);
+    }
+    Papa.parse(data, {
+      header: true,
+      complete: (results) => {
+        const dataUpdate = [];
+        const edgesUpdate = [];
+        results.data.forEach((record, index) => {
+          const nameNodeId = `name_${index}`;
+          const ageNodeId = `age_${index}`;
+
+          const nameNode = {
+            id: nameNodeId,
+            type: 'default',
+            data: { label: `name: ${record.Name.toLowerCase()}` },
+            position: { x: 250, y: 5 + index * 200 },
+          };
+
+          const ageNode = {
+            id: ageNodeId,
+            type: 'default',
+            data: { label: `age: ${record.Age}` },
+            position: { x: 450, y: 5 + index * 200 },
+          };
+
+          const edge = {
+            id: `edge_${index}`,
+            source: nameNodeId,
+            target: ageNodeId,
+          };
+
+          dataUpdate.push(nameNode, ageNode);
+          edgesUpdate.push(edge);
+        });
+        res.json({ nodes: dataUpdate, edges: edgesUpdate });
+      },
+    });
+  });
+},[59000]);
+});
 module.exports = router;

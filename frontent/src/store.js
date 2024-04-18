@@ -1,27 +1,48 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+//for home
+const usehomeNodeStore = create(
+  persist(
+    (set) => ({
+      homenodeData: [],
+      updatehomeNodeData: (nodeData) => set({ homenodeData: nodeData }),
+    }),
+    { name: 'homeNodeData' }
+  )
+);
 
+const usehomeEdgeStore = create(
+  persist(
+    (set) => ({
+      homeedgeData: [],
+      updatehomeEdgeData: (edgeData) => set({ homeedgeData: edgeData }),
+    }),
+    { name: 'homeEdgeData' }
+  )
+);
+
+//for myworkfloew
 const useAppStore = create(
   persist(
     (set, get) => ({
-      nodeData: {},
+      nodeData: [],
       updateNodeData: (nodeData) => set({ nodeData: nodeData }),
     }),
     {
-      name: 'App-storage', // name of the item in the storage (must be unique)
+      name: 'App-storage', 
      
     },
   ),
 )
 
-const useedgeStore = create(
+const useEdgeStore = create(
   persist(
     (set, get) => ({
       edgeData: [],
       updateEdgeData: (edgeData) => set({ edgeData:edgeData }),
     }),
     {
-      name: 'Edge-storage', // name of the item in the storage (must be unique)
+      name: 'Edge-storage', 
     },
   ),
 );
@@ -35,9 +56,9 @@ const useWorkflow = create(
       },
     }),
     {
-      name: 'Workflow-storage', // name of the item in the storage (must be unique)
+      name: 'Workflow-storage', 
     },
   ),
 );
-export default useAppStore
-export {useedgeStore,useWorkflow}
+
+export {usehomeNodeStore ,usehomeEdgeStore,useAppStore, useEdgeStore ,useWorkflow } ;

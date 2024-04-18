@@ -2,32 +2,45 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './sidebar.css';
 import { Link } from 'react-router-dom';
-import useAppStore,{ useWorkflow,useedgeStore } from '../../store';
+import { useWorkflow,useEdgeStore, useAppStore } from '../../store';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {usehomeNodeStore, usehomeEdgeStore} from  "../../store"
+import { useNavigate } from "react-router-dom";
 type NodeType = 'input' | 'default' | 'output';
-const NodeSidebar: React.FC = () => {
+
+const NodeSidebar = ({index}:{index:string}) => {
+  let history = useNavigate();
+  const { homenodeData, updatehomeNodeData } = usehomeNodeStore();
+  const { homeedgeData, updatehomeEdgeData } = usehomeEdgeStore();
   const {workflowData, updateWorkflowData} = useWorkflow();
-  const {edgeData,updateEdgeData} = useedgeStore();
+  const {edgeData,updateEdgeData} = useEdgeStore();
   const {nodeData,updateNodeData} = useAppStore();
   const [getworkflowData,setWorkfloeData] = useState<[]>([]);
   const [getNodes,setgetNodes] = useState<[]>([]);
   const [getEdges,setgetEdges] = useState<[]>([]);
-
+//new workflow
+const newWorkflow =()=>{
+    updatehomeNodeData([]);
+    updatehomeEdgeData([]);
+    history('/');
+}
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: NodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
+  //for save to Database
   const saveWorkflow =async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    if(index==="workflow"){
     localStorage.setItem('workflowData', JSON.stringify({ edges: edgeData, nodes: nodeData }));
     const savedWorkflowData = localStorage.getItem('workflowData');
     if (savedWorkflowData) {
       const { edges, nodes } = JSON.parse(savedWorkflowData);
       updateWorkflowData(edges, nodes);
-    
     try {
       await axios.post(`/workflow`,{nodes,edges},
+
         {
           headers: {
             'Access-Control-Allow-Origin' : '*',
@@ -37,23 +50,59 @@ const NodeSidebar: React.FC = () => {
             }
       )
       .then((res)=>{
-        toast.success("Workflow created successfully");
+        if(res.status===201){
+          toast.success("Workflow created successfully");
+        }
       })
       .catch((err)=>{
-        console.log(err);
+        if(err.status===500){
+          toast.error("Error creating workflow");
+        }
       })
     } catch (error) {
       
     }
   }
-  };
-  const LoadData = () =>{
-    updateNodeData(getNodes);
-    updateEdgeData(getEdges)
+}
+
+//for home page data
+else if(index==="home"){
+  try {
+    await axios.post(`/workflow`,{nodes:homenodeData,edges:homeedgeData},
+      {
+        headers: {
+          'Access-Control-Allow-Origin' : '*',
+          'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+          'content-type':'application/json; charset=utf-8'
+        }
+          }
+    )
+    .then((res)=>{
+      if(res.status===201){
+        toast.success("Workflow created successfully");
+      }
+    })
+    .catch((err)=>{
+      if(err.status===500){
+        toast.error("Error creating workflow");
+      }
+    })
+  } catch (error) {
+    
   }
+
+}
+  };
+
+  // const LoadData = () =>{
+  //   updateNodeData(getNodes);
+  //   updateEdgeData(getEdges);
+  //   console.log(edgeData,nodeData);
+
+  // }
 useEffect(()=>{
   try {
-    axios.get('workflowdata',
+    axios.get('/workflowdata',
     {
       headers: {
         'Access-Control-Allow-Origin' : '*',
@@ -72,8 +121,7 @@ useEffect(()=>{
   } catch (error) {
     
   }
-},[workflowData])
-console.log(nodeData,edgeData);
+},[workflowData]);
   return (
     <>
     <aside>
@@ -99,6 +147,9 @@ console.log(nodeData,edgeData);
       >
         Output Node
       </div>
+      <div className="bg-main rounded-lg mb-2 flex justify-center cursor-pointer hover:bg-bghover">
+      <button onClick={newWorkflow} className=' p-2  text-xl font-bold text-white'>New workflow</button>
+      </div>
       <Link to={'/upload'} className="flex justify-center bg-main rounded-lg cursor-pointer hover:bg-bghover">
         <h1 className=" p-2  text-white font-bold text-xl">Upload File +</h1>
       </Link>
@@ -106,11 +157,11 @@ console.log(nodeData,edgeData);
       <button onClick={saveWorkflow} className=' p-2  text-xl font-bold text-white'>Save File</button>
       </div>
       <div className="flex  flex-col justify-center p-2 items-center gap-2 mt-2">
-        {getworkflowData.map(({_id,nodes,edges},index)=>(
+        {getworkflowData.map(({_id,nodes,edges})=>(
           <>
-          <span className=" border border-main p-1 flex justify-center flex-col gap-2 w-full">
+          <span key={_id} className=" border border-main p-1 flex justify-center flex-col gap-2 w-full">
           <p>{_id}</p>
-     {/* <button onClick={()=>{setgetNodes(nodes);setgetEdges(edges);LoadData()}} className='bg-main text-white font-bold p-1 px-3 rounded-md  hover:bg-bghover'>Load</button> */}
+     {/* <button onClick={()=>{setgetNodes(nodes);setgetEdges(edges);LoadData()}} className='bg-main text-white font-bold p-1 px-3 rounded-md  hover:bg-bghover'>Execute</button> */}
      </span>
      </>
         ))}

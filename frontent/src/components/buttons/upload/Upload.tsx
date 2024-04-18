@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import Papa from 'papaparse';
 import './upload.css';
-import useAppStore,{useedgeStore} from '../../../store';
-
-
+import {useEdgeStore , useAppStore} from '../../../store';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader/Loader.jsx';
 interface Node {
   id: string;
   type: string;
@@ -21,57 +22,44 @@ interface Edge {
 const UploadButton = () => {
   let history = useNavigate();
   const {updateNodeData} = useAppStore();
-  const {updateEdgeData} = useedgeStore();
-  const {edgeData} = useedgeStore();
-  const [count,setCount] = useState<number>(60);
-  const [start,setStart] = useState<boolean>(false);
-  const handleFileUpload = (e: any) => {
-    const file = e.target.files![0];
-    Papa.parse(file, {
-      header: true,
-      complete: (res: any) => {
-        const dataUpdate: Node[] = [];
-        const edgesUpdate: Edge[] = [];
-        res.data.forEach((record: any, index: number) => {
-          const nameNodeId = `name_${index}`;
-          const ageNodeId = `age_${index}`;
-  
-          const nameNode: Node = {
-            id: nameNodeId,
-            type: 'default',
-            data: { label: `Name: ${record.Name.toLowerCase()}` },
-            position: { x: 250, y: 5 + index * 200 },
-          };
-  
-          const ageNode: Node = {
-            id: ageNodeId,
-            type: 'default',
-            data: { label: `Age: ${record.Age}` },
-            position: { x: 450, y: 5 + index * 200 },
-          };
-  
-          const edge: Edge = {
-            id: `edge_${index}`,
-            source: nameNodeId,
-            target: ageNodeId,
-          };
-  
-          dataUpdate.push(nameNode, ageNode);
-          edgesUpdate.push(edge);
-        });
-        
-        updateNodeData(dataUpdate);
-        updateEdgeData(edgesUpdate);
-        setStart(true);
-        setInterval(()=>{
-          setCount(pre=>pre-1);
-        },1000)
-       setTimeout(()=>{
+  const {updateEdgeData} = useEdgeStore();
+  const [loader,setLoader] = useState<boolean>(false);
 
-         history('/myWorkflow');
-       },60000);
-      },
-    });
+  //for uploaded the file
+  const handleFileUpload = async (e: any) => {
+    setLoader(true);
+    const file = e.target.files![0];
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await axios.post("/upload", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res)=>{
+        if(res.status===200){
+          setLoader(false);
+          toast.success("Data excution sussessfully");
+          setTimeout(()=>{
+            updateNodeData(res.data.nodes);
+            updateEdgeData(res.data.edges);
+            history('/myWorkflow');
+          },1000);
+
+        }
+
+      })
+      .catch((error)=>{
+        if(error.status===500){
+          setLoader(false);
+          toast.error("workflow error");
+        }
+        //  console.log(error);
+      })
+    } catch (error) {
+      setLoader(false);
+    }
   };
 
   return (
@@ -88,13 +76,15 @@ const UploadButton = () => {
       <p>Drag and Drop</p>
       <p>or</p>
       <span className="browse-button">Upload file +</span>
-      <div className='text-black '>{start?<p>{count}</p>:null}</div>
-
+      {loader?<Loader/>:null}
+      
     </div>
     <input accept='.csv' onChange={handleFileUpload} id="file" type="file" />
   </label>
 </form>
 </div>
+<ToastContainer />
+
 </>
   )
 }

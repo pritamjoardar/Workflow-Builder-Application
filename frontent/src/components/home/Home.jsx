@@ -1,5 +1,5 @@
-import  { useState, useRef, useCallback } from 'react';
-
+import  { useState, useRef, useCallback, useEffect } from 'react';
+import {usehomeNodeStore, usehomeEdgeStore} from  "../../store"
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -28,9 +28,12 @@ const getId = () => `dndnode_${id++}`;
 
 
 const Home = () => {
+  const { homenodeData, updatehomeNodeData } = usehomeNodeStore();
+  const { homeedgeData, updatehomeEdgeData } = usehomeEdgeStore();
+
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(homenodeData);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(homeedgeData);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
   const onConnect = useCallback(
@@ -69,14 +72,17 @@ const Home = () => {
     },
     [reactFlowInstance,setNodes],
   );
-
+useEffect(()=>{
+  updatehomeNodeData(nodes);
+  updatehomeEdgeData(edges);
+},[nodes,edges,usehomeEdgeStore,usehomeNodeStore]);
   return (
     <div className="dndflow"  style={{ width: '100vw', height: '100vh' }}>
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
+            nodes={homenodeData}
+            edges={homeedgeData}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -90,7 +96,7 @@ const Home = () => {
             <Background variant="dots" gap={12} size={1} />
           </ReactFlow>
         </div>
-        <NodeSidebar/>
+        <NodeSidebar index = {"home"}/>
       </ReactFlowProvider>
     </div>
   );
