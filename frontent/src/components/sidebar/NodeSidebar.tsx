@@ -94,12 +94,13 @@ else if(index==="home"){
 }
   };
 
-  // const LoadData = () =>{
-  //   updateNodeData(getNodes);
-  //   updateEdgeData(getEdges);
-  //   console.log(edgeData,nodeData);
+/*  const LoadData = () =>{
+    updateNodeData(getNodes);
+    updateEdgeData(getEdges);
+    console.log(edgeData,nodeData);
 
-  // }
+  }
+  */
 useEffect(()=>{
   try {
     axios.get('/workflowdata',

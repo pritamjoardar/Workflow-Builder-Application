@@ -18,6 +18,7 @@ const Connect =async()=>{
 }     
 Connect();
 
+//for lisning the port
 app.listen(PORT,()=>{
     console.log(`app is Listening on port no ${PORT}`);
 })
