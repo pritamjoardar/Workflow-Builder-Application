@@ -9,9 +9,13 @@ const upload = multer({ dest: 'uploads/' });
 router.post('/workflow',async(req,res)=>{
     try {
         const { nodes, edges } = req.body;
+        if(nodes.length==0 || edges.length==0){
+          return res.status(500).json({ message: 'Please provide nodes and edges' });
+        }else{
         const newWorkflow = new Workflow({ nodes, edges });
         await newWorkflow.save();
         res.status(201).json({ message: 'Workflow data saved successfully' });
+        }
       } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error saving workflow data' });

@@ -39,6 +39,10 @@ const newWorkflow =()=>{
       const { edges, nodes } = JSON.parse(savedWorkflowData);
       updateWorkflowData(edges, nodes);
     try {
+      if(edges.length == 0 || nodes.length==0) {
+        toast.error("workflow error");
+        return;
+      }
       await axios.post(`/workflow`,{nodes,edges},
 
         {
@@ -56,10 +60,12 @@ const newWorkflow =()=>{
       })
       .catch((err)=>{
         if(err.status===500){
-          toast.error("Error creating workflow");
+          toast.error("Empty workflow");
         }
       })
     } catch (error) {
+      toast.error('Something went wrong');
+      console.log("error"+error);
       
     }
   }
@@ -68,6 +74,10 @@ const newWorkflow =()=>{
 //for home page data
 else if(index==="home"){
   try {
+    if(homenodeData.length == 0 || homeedgeData.length==0) {
+      toast.error("workflow empty");
+      return;
+    }
     await axios.post(`/workflow`,{nodes:homenodeData,edges:homeedgeData},
       {
         headers: {
@@ -88,6 +98,7 @@ else if(index==="home"){
       }
     })
   } catch (error) {
+    toast.error('Something went wrong');
     
   }
 
