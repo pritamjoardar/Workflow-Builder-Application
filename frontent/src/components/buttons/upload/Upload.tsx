@@ -6,7 +6,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader/Loader.jsx';
-interface Node {
+/*interface Node {
   id: string;
   type: string;
   data: { label: string };
@@ -18,7 +18,7 @@ interface Edge {
   source: string;
   target: string;
 }
-
+*/
 const UploadButton = () => {
   let history = useNavigate();
   const {updateNodeData} = useAppStore();

@@ -64,7 +64,7 @@ const Myworkflow = () => {
 useEffect(()=>{
   updateNodeData(nodes);
   updateEdgeData(edges);
-},[nodes,edges,nodeData,edgeData]);
+},[nodes,edges,nodeData,edgeData,updateNodeData,updateEdgeData]);
   return (
     <div className="dndflow"  style={{ width: '100vw', height: '100vh' }}>
       <ReactFlowProvider>

@@ -14,11 +14,11 @@ const NodeSidebar = ({index}:{index:string}) => {
   const { homenodeData, updatehomeNodeData } = usehomeNodeStore();
   const { homeedgeData, updatehomeEdgeData } = usehomeEdgeStore();
   const {workflowData, updateWorkflowData} = useWorkflow();
-  const {edgeData,updateEdgeData} = useEdgeStore();
-  const {nodeData,updateNodeData} = useAppStore();
+  const {edgeData} = useEdgeStore();
+  const {nodeData} = useAppStore();
   const [getworkflowData,setWorkfloeData] = useState<[]>([]);
-  const [getNodes,setgetNodes] = useState<[]>([]);
-  const [getEdges,setgetEdges] = useState<[]>([]);
+  // const [getNodes,setgetNodes] = useState<[]>([]);
+  // const [getEdges,setgetEdges] = useState<[]>([]);
 //new workflow
 const newWorkflow =()=>{
     updatehomeNodeData([]);

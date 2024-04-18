@@ -14,6 +14,7 @@ import 'reactflow/dist/style.css';
 import NodeSidebar from "../sidebar/NodeSidebar";
 
 //initial nodes
+/*
 const initialNodes = [
   {
     id: '1',
@@ -22,10 +23,10 @@ const initialNodes = [
     position: { x: 250, y: 5 },
   },
 ];
+*/
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
-
 
 const Home = () => {
   const { homenodeData, updatehomeNodeData } = usehomeNodeStore();
@@ -72,10 +73,12 @@ const Home = () => {
     },
     [reactFlowInstance,setNodes],
   );
+
 useEffect(()=>{
   updatehomeNodeData(nodes);
   updatehomeEdgeData(edges);
 },[nodes,edges,usehomeEdgeStore,usehomeNodeStore]);
+
   return (
     <div className="dndflow"  style={{ width: '100vw', height: '100vh' }}>
       <ReactFlowProvider>
