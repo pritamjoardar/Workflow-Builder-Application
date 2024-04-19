@@ -39,7 +39,7 @@ const newWorkflow =()=>{
       const { edges, nodes } = JSON.parse(savedWorkflowData);
       updateWorkflowData(edges, nodes);
     try {
-      if(edges.length == 0 || nodes.length==0) {
+      if(edges.length === 0 || nodes.length === 0) {
         toast.error("workflow error");
         return;
       }
@@ -74,7 +74,7 @@ const newWorkflow =()=>{
 //for home page data
 else if(index==="home"){
   try {
-    if(homenodeData.length == 0 || homeedgeData.length==0) {
+    if(homenodeData.length === 0 || homeedgeData.length === 0) {
       toast.error("workflow empty");
       return;
     }
